@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# Update and upgrade the system
-sudo apt update && sudo apt upgrade -y
-
-# Install necessary tools
-sudo apt install -y curl git unzip 
-
 # Install Docker
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
