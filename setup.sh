@@ -2,13 +2,13 @@
 
 # This script sets up and runs Auto-GPT in a Docker container.
 
-echo "Starting Auto-GPT setup script..."
+echo "Installing docker..."
 sudo apt install -y docker.io
-echo "Starting Auto-GPT setup script..."
+echo "Installing docker-compose..."
 sudo apt install docker-compose
-echo "Starting Auto-GPT setup script..."
+echo "Docker version is"
 docker -v
-echo "Starting Auto-GPT setup script..."
+echo "Creating folder..."
 mkdir Auto-GPT
 cd Auto-GPT
 
@@ -44,7 +44,9 @@ echo "OPENAI_API_KEY=$OPENAI_API_KEY" > .env
 # Notify the user that the file was created
 echo "The .env file has been created with your API key."
 
+echo "pull docker..."
 sudo docker pull significantgravitas/auto-gpt
 
+echo "starting AutoGPT..."
 sudo docker-compose run --rm auto-gpt
 
