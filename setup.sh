@@ -6,7 +6,7 @@ curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 
 # Add the user to the docker group (automatically fetches current username)
-echo "Adding current user to the docker group..."
+echo "Adding current user to Docker group..."
 sudo usermod -aG docker $USER
 
 # Install Docker Compose
@@ -14,9 +14,10 @@ echo "Installing Docker Compose..."
 sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 
-# Re-evaluate group membership and run the rest of the commands in a subshell
+# Re-evaluate group membership and start a new shell
 echo "Re-evaluating group membership..."
-newgrp docker <<EONG
+newgrp docker << EOF
+
 # Clone the Auto-GPT repository
 echo "Cloning the Auto-GPT repository..."
 git clone -b stable https://github.com/Significant-Gravitas/Auto-GPT.git
@@ -27,7 +28,7 @@ echo -n "Enter your OpenAI API key: "
 read -r OPENAI_API_KEY
 
 # Replace the placeholder with the user's OpenAI API key in the .env file
-echo "Replacing the placeholder with the user's OpenAI API key in the .env file..."
+echo "Replacing placeholder with the user's OpenAI API key in the .env file..."
 cp .env.template .env
 sed -i "s/OPENAI_API_KEY=/OPENAI_API_KEY=$OPENAI_API_KEY/" .env
 
@@ -39,4 +40,5 @@ docker pull significantgravitas/auto-gpt
 echo "Building and running Auto-GPT..."
 docker-compose build auto-gpt
 docker-compose run --rm auto-gpt
-EONG
+
+EOF
