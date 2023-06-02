@@ -1,44 +1,37 @@
 #!/bin/bash
 
-# Install Docker
-echo "Installing Docker..."
-curl -fsSL https://get.docker.com -o get-docker.sh
-sudo sh get-docker.sh
+# This script sets up and runs Auto-GPT in a Docker container.
 
-# Add the user to the docker group (automatically fetches current username)
-echo "Adding current user to Docker group..."
-sudo usermod -aG docker $USER
+# Start with some debugging information
+echo "Starting Auto-GPT setup script..."
 
-# Install Docker Compose
-echo "Installing Docker Compose..."
-sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
+# Check if the user is in the docker group
+if ! id -nG "$USER" | grep -qw docker; then
+    echo "Adding user to the docker group..."
+    sudo usermod -aG docker $USER
+fi
 
-# Re-evaluate group membership and start a new shell
+# Re-evaluating group membership
 echo "Re-evaluating group membership..."
-newgrp docker << EOF
+sudo su - $USER
 
-# Clone the Auto-GPT repository
+# Cloning the Auto-GPT repository
 echo "Cloning the Auto-GPT repository..."
 git clone -b stable https://github.com/Significant-Gravitas/Auto-GPT.git
 cd Auto-GPT
 
-# Prompt the user for the OpenAI API key
-echo -n "Enter your OpenAI API key: "
-read -r OPENAI_API_KEY
+# Ask the user for their OpenAI API key
+echo "Enter your OpenAI API key: "
+read OPENAI_API_KEY
 
-# Replace the placeholder with the user's OpenAI API key in the .env file
-echo "Replacing placeholder with the user's OpenAI API key in the .env file..."
-cp .env.template .env
-sed -i "s/OPENAI_API_KEY=/OPENAI_API_KEY=$OPENAI_API_KEY/" .env
+# Replacing the placeholder with the user's OpenAI API key in the .env file
+echo "Replacing the placeholder with your OpenAI API key in the .env file..."
+sed -i "s/your-openai-key/${OPENAI_API_KEY}/g" .env
 
-# Pull the latest Docker image
+# Pulling the latest Docker image
 echo "Pulling the latest Docker image..."
 docker pull significantgravitas/auto-gpt
 
-# Build and run Auto-GPT
-echo "Building and running Auto-GPT..."
-docker-compose build auto-gpt
+# Running the Docker image
+echo "Running the Docker image..."
 docker-compose run --rm auto-gpt
-
-EOF
